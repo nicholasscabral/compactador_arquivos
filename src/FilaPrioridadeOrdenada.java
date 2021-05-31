@@ -9,37 +9,39 @@ public class FilaPrioridadeOrdenada {
         contador = 0;
     }
 
-    public void enqueue(int valor, int frequencia) {
-        No novo = new No(valor, frequencia);
+    public void enqueue(char letra, int frequencia) {
+        if (!this.contains(letra)) {
+            No novo = new No(letra, frequencia);
 
-        if (primeiro == null) {
-            primeiro = novo;
-            ultimo = novo;
-        }
-        else if (novo.frequencia < primeiro.frequencia) {
-            novo.proximo = primeiro;
-            primeiro.anterior = novo;
-            primeiro = novo;
-        }
-        else if (novo.frequencia >= ultimo.frequencia) {
-            ultimo.proximo = novo;
-            novo.anterior = ultimo;
-            ultimo = novo;
-        }
-        else {
-            No aux = primeiro;
-
-            while (aux != null && novo.frequencia >= aux.frequencia) {
-                aux = aux.proximo;
+            if (primeiro == null) {
+                primeiro = novo;
+                ultimo = novo;
             }
+            else if (novo.frequencia > primeiro.frequencia) {
+                novo.proximo = primeiro;
+                primeiro.anterior = novo;
+                primeiro = novo;
+            }
+            else if (novo.frequencia <= ultimo.frequencia) {
+                ultimo.proximo = novo;
+                novo.anterior = ultimo;
+                ultimo = novo;
+            }
+            else {
+                No aux = primeiro;
 
-            novo.proximo = aux;
-            novo.anterior = aux.anterior;
-            aux.anterior = novo;
-            novo.anterior.proximo = novo;
+                while (aux != null && novo.frequencia <= aux.frequencia) {
+                    aux = aux.proximo;
+                }
 
+                novo.proximo = aux;
+                novo.anterior = aux.anterior;
+                aux.anterior = novo;
+                novo.anterior.proximo = novo;
+
+            }
+            contador++;
         }
-        contador++;
     }
 
     public void dequeue() {
@@ -54,6 +56,18 @@ public class FilaPrioridadeOrdenada {
             return primeiro;
         }
         return null;
+    }
+
+    public boolean contains(char letra) {
+        No aux = primeiro;
+
+        while (aux != null) {
+            if (letra == aux.caracter)
+                return true;
+            aux = aux.proximo;
+        }
+
+        return false;
     }
 
     public int size() {

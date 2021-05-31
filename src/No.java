@@ -3,10 +3,10 @@ public class No {
     public No proximo;
     public No esquerdo;
     public No direito;
-    public int caracter;
+    public char caracter;
     public int frequencia;
 
-    public No(int dado, int frequencia) {
+    public No(char dado, int frequencia) {
         this.anterior = null;
         this.proximo = null;
         this.esquerdo = null;
