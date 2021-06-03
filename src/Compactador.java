@@ -13,20 +13,34 @@ public class Compactador {
     }
 
     public static void main(String[] args) throws FileNotFoundException {
-        String path = "C:/Users/nicho/OneDrive/Documentos/Programacao/projetos/compactador_arquivos/src/dados.txt";
+
+        String path = "src/dados.txt";
         Scanner file = new Scanner(new FileReader(path)).useDelimiter("\\n");
 
         FilaPrioridadeOrdenada fila = new FilaPrioridadeOrdenada();
 
-        String line = file.next();
-        char[] caracteres = line.toCharArray();
+        int[] ascciTable = new int[256];
 
-        for (char c : caracteres) {
-            int frequencia = count(c, line);
-
-            fila.enqueue(c, frequencia);
+        for (int i = 0; i <= 255; i++) {
+            ascciTable[i] = 0;
         }
 
+        while (file.hasNext()) {
+            String line = file.next();
+            char[] caracteres = line.toCharArray();
+
+            for (char c : caracteres) {
+                int indiceAscci = c;
+                ascciTable[indiceAscci] += 1;
+            }
+
+            for (char c : caracteres) {
+                int indiceAscci = c;
+                fila.enqueue(c, ascciTable[indiceAscci]);
+            }
+        }
+
+        System.out.println(ascciTable[97]); // a
         fila.list();
     }
 }
