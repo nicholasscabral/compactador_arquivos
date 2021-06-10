@@ -14,4 +14,10 @@ public class No {
         this.caracter = dado;
         this.frequencia = frequencia;
     }
+
+    public No(No direito, No esquerdo) {
+        this.esquerdo = esquerdo;
+        this.direito = direito;
+        this.frequencia = esquerdo.frequencia + direito.frequencia;
+    }
 }
