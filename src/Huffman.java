@@ -1,9 +1,9 @@
-public class FilaPrioridadeOrdenada {
+public class Huffman {
     public No primeiro;
     public No ultimo;
     public int contador;
 
-    public FilaPrioridadeOrdenada() {
+    public Huffman() {
         primeiro = null;
         ultimo = null;
         contador = 0;
@@ -102,6 +102,24 @@ public class FilaPrioridadeOrdenada {
         }
 
         return false;
+    }
+
+    public String buildBinaryCode(char target, No root) {
+        if(root.isLeaf()) {
+            if(root.caracter == target)
+                return "";
+            else
+                return null;
+        }
+
+        String aux;
+        if((aux = buildBinaryCode(target, root.esquerdo)) != null)
+            return '0' + aux;
+
+        if((aux = buildBinaryCode(target, root.direito)) != null)
+            return '1' + aux;
+
+        return null;
     }
 
     public int size() {

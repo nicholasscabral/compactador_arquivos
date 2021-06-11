@@ -20,4 +20,10 @@ public class No {
         this.direito = direito;
         this.frequencia = esquerdo.frequencia + direito.frequencia;
     }
+
+    public boolean isLeaf() {
+        if (direito == null && esquerdo == null)
+            return true;
+        return false;
+    }
 }
