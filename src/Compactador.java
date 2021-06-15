@@ -13,37 +13,41 @@ public class Compactador {
         int[] ascciTable = new int[256];
         String[] codeTable = new String[256];
 
+        int indiceAscci;
+        No left, right, root;
+        String line, code;
+
         for (int i = 0; i <= 255; i++) {
             ascciTable[i] = 0;
         }
 
         while (file.hasNext()) {
-            String line = file.next();
+            line = file.next();
             char[] caracteres = line.toCharArray();
 
             for (char c : caracteres) {
-                int indiceAscci = c;
-                ascciTable[indiceAscci] += 1;
+                indiceAscci = c;
+                ascciTable[indiceAscci]++;
             }
 
             for (char c : caracteres) {
-                int indiceAscci = c;
+                indiceAscci = c;
                 huffman.enqueue(c, ascciTable[indiceAscci]);
             }
         }
 
         while (huffman.primeiro != huffman.ultimo){
-            No left = huffman.dequeue();
-            No right = huffman.dequeue();
+            left = huffman.dequeue();
+            right = huffman.dequeue();
 
-            No root = new No(right, left);
+            root = new No(right, left);
             huffman.enqueue(root);
         }
 
         for (int i = 0; i < 255; i++) {
             if (ascciTable[i] != 0) {
                 char c = (char) i;
-                String code = huffman.buildBinaryCode(c, huffman.primeiro);
+                code = huffman.buildBinaryCode(c, huffman.primeiro);
                 codeTable[c] = code;
             }
         }
