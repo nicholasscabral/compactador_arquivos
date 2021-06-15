@@ -3,6 +3,8 @@ public class Huffman {
     public No ultimo;
     public int contador;
 
+    No left, right, root;
+
     public Huffman() {
         primeiro = null;
         ultimo = null;
@@ -104,6 +106,16 @@ public class Huffman {
         return false;
     }
 
+    public void buildTree() {
+        while (primeiro != ultimo){
+            left = dequeue();
+            right = dequeue();
+
+            root = new No(right, left);
+            enqueue(root);
+        }
+    }
+
     public String buildBinaryCode(char target, No root) {
         if(root.isLeaf()) {
             if(root.caracter == target)
@@ -126,19 +138,29 @@ public class Huffman {
         return contador;
     }
 
-    public void list() {
-        this.list(primeiro);
+    public void listQueue() {
+        No aux = primeiro;
+
+        while (aux != null) {
+            System.out.print(aux.caracter + "(" + aux.frequencia + ") ");
+            aux = aux.proximo;
+        }
         System.out.println();
     }
 
-    private void list(No root) {
+    public void listTree() {
+        this.listTree(primeiro);
+        System.out.println();
+    }
+
+    private void listTree(No root) {
         if (root.esquerdo != null)
-            this.list(root.esquerdo);
+            this.listTree(root.esquerdo);
 
         System.out.print(root.caracter + "" + root.frequencia + " "); // ORDEM
 
         if (root.direito != null) {
-            this.list(root.direito);
+            this.listTree(root.direito);
         }
     }
 }
