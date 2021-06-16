@@ -1,14 +1,25 @@
+import java.io.*;
+
 public class Huffman {
-    public No primeiro;
-    public No ultimo;
-    public int contador;
+    private No primeiro, ultimo, left, right, root;
+    private int contador;
+    private int[] asciiTable;
+    private String[] codeTable;
+    private String code, line, fileOutPath = "src/saida.txt";
+    private BufferedReader fileIn;
+    private BufferedWriter fileOut = new BufferedWriter(new FileWriter(fileOutPath));
 
-    No left, right, root;
-
-    public Huffman() {
+    public Huffman() throws IOException {
         primeiro = null;
         ultimo = null;
         contador = 0;
+
+        asciiTable = new int[256];
+        codeTable = new String[256];
+
+        for (int i = 0; i <= 255; i++) {
+            asciiTable[i] = 0;
+        }
     }
 
     public void enqueue(char letra, int frequencia) {
@@ -87,13 +98,6 @@ public class Huffman {
         return null;
     }
 
-    public No front() {
-        if (primeiro != null) {
-            return primeiro;
-        }
-        return null;
-    }
-
     public boolean contains(char letra) {
         No aux = primeiro;
 
@@ -106,7 +110,46 @@ public class Huffman {
         return false;
     }
 
-    public void buildTree() {
+    // preenche a tabela de frequencias
+    private void countFrequency(char[] caracteres) {
+        for (char c : caracteres)
+            asciiTable[c]++;
+
+        for (char c : caracteres)
+            this.enqueue(c, asciiTable[c]);
+    }
+
+    public void compress(String fileInPath) throws IOException {
+        fileIn = new BufferedReader(new FileReader(fileInPath));
+
+        while (fileIn.ready()) {
+            line = fileIn.readLine();
+            char[] caracteres = line.toCharArray();
+
+            this.countFrequency(caracteres);
+        }
+
+        // construindo a arvore binaria baseada na frequencia
+        this.buildTree();
+
+        // construindo codigo binario de cada caracter e add na tabela de codigos
+        for (int i = 0; i < 255; i++) {
+            if (asciiTable[i] != 0) {
+                char c = (char) i;
+                code = this.buildBinaryCode(c, this.primeiro);
+                codeTable[c] = code;
+            }
+        }
+
+        fileOut.write("ainda nao deu bom saporra");
+        fileOut.close();
+    }
+
+    public void expand(String fileInPath) throws FileNotFoundException {
+        fileIn = new BufferedReader(new FileReader(fileInPath));
+    }
+
+    private void buildTree() {
         while (primeiro != ultimo){
             left = dequeue();
             right = dequeue();
@@ -116,7 +159,7 @@ public class Huffman {
         }
     }
 
-    public String buildBinaryCode(char target, No root) {
+    private String buildBinaryCode(char target, No root) {
         if(root.isLeaf()) {
             if(root.caracter == target)
                 return "";
@@ -138,7 +181,7 @@ public class Huffman {
         return contador;
     }
 
-    public void listQueue() {
+    private void listQueue() {
         No aux = primeiro;
 
         while (aux != null) {
