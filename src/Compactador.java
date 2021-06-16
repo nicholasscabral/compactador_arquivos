@@ -15,9 +15,9 @@ public class Compactador {
         int operation = input.nextInt();
         switch (operation) {
             case 1: {
-                System.out.println("insira o caminho do arquivo a ser compactado");
-                pathIn = input.next();
-                huffman.compress(pathIn);
+                //System.out.println("insira o caminho do arquivo a ser compactado");
+                //pathIn = input.next();
+                huffman.compress("src/entrada.txt");
                 break;
             }
             case 2: {

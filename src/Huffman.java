@@ -110,6 +110,15 @@ public class Huffman {
         return false;
     }
 
+    private String encode(String text) {
+        StringBuilder out = new StringBuilder();
+        for (char c : text.toCharArray()) {
+            out.append(codeTable[c]);
+        }
+
+        return out.toString();
+    }
+
     // preenche a tabela de frequencias
     private void countFrequency(char[] caracteres) {
         for (char c : caracteres)
@@ -121,11 +130,12 @@ public class Huffman {
 
     public void compress(String fileInPath) throws IOException {
         fileIn = new BufferedReader(new FileReader(fileInPath));
+        String aux = "";
 
         while (fileIn.ready()) {
             line = fileIn.readLine();
             char[] caracteres = line.toCharArray();
-
+            aux += line;
             this.countFrequency(caracteres);
         }
 
@@ -141,7 +151,8 @@ public class Huffman {
             }
         }
 
-        fileOut.write("ainda nao deu bom saporra");
+        String out = this.encode(aux);
+        fileOut.write(out);
         fileOut.close();
     }
 
