@@ -132,7 +132,9 @@ public class Huffman {
 
     private void buildEncodedBinaryChain(No root) {
         if (root.isLeaf()) {
-            encodedBinaryChain.append("10").append(Integer.toBinaryString(root.caracter));
+            encodedBinaryChain
+                    .append("1")
+                    .append(String.format("%8s", Integer.toBinaryString(root.caracter)).replace(' ', '0'));
         }
 
         encodedBinaryChain.append("0");
