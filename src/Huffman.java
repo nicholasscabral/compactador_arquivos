@@ -8,6 +8,8 @@ public class Huffman {
     private String code, line, fileOutPath = "src/saida.txt";
     private BufferedReader fileIn;
     private BufferedWriter fileOut = new BufferedWriter(new FileWriter(fileOutPath));
+    private StringBuilder encodedBinaryChain = new StringBuilder();
+
 
     public Huffman() throws IOException {
         primeiro = null;
@@ -22,7 +24,7 @@ public class Huffman {
         }
     }
 
-    public void enqueue(char letra, int frequencia) {
+    private void enqueue(char letra, int frequencia) {
         if (!this.contains(letra)) {
             No novo = new No(letra, frequencia);
 
@@ -57,7 +59,7 @@ public class Huffman {
         }
     }
 
-    public void enqueue(No root) {
+    private void enqueue(No root) {
         if (primeiro == null) {
             primeiro = root;
             ultimo = root;
@@ -88,7 +90,7 @@ public class Huffman {
         contador++;
     }
 
-    public No dequeue() {
+    private No dequeue() {
         if (primeiro != null) {
             No aux = primeiro;
             primeiro = primeiro.proximo;
@@ -98,7 +100,7 @@ public class Huffman {
         return null;
     }
 
-    public boolean contains(char letra) {
+    private boolean contains(char letra) {
         No aux = primeiro;
 
         while (aux != null) {
@@ -128,14 +130,28 @@ public class Huffman {
             this.enqueue(c, asciiTable[c]);
     }
 
+    private void buildEncodedBinaryChain(No root) {
+        if (root.isLeaf()) {
+            encodedBinaryChain.append("10").append(Integer.toBinaryString(root.caracter));
+        }
+
+        encodedBinaryChain.append("0");
+        if (root.esquerdo != null)
+            buildEncodedBinaryChain(root.esquerdo);
+
+        if (root.direito != null)
+            buildEncodedBinaryChain(root.direito);
+    }
+
     public void compress(String fileInPath) throws IOException {
         fileIn = new BufferedReader(new FileReader(fileInPath));
-        String aux = "";
 
+        StringBuilder lines = new StringBuilder();
+        // lendo cada linha do arquvio e contando frequencia dos caracteres
         while (fileIn.ready()) {
             line = fileIn.readLine();
+            lines.append(line);
             char[] caracteres = line.toCharArray();
-            aux += line;
             this.countFrequency(caracteres);
         }
 
@@ -151,7 +167,8 @@ public class Huffman {
             }
         }
 
-        String out = this.encode(aux);
+        String out = this.encode(lines.toString());
+        fileOut.write(encodedBinaryChain.toString() + "\n");
         fileOut.write(out);
         fileOut.close();
     }
@@ -168,6 +185,7 @@ public class Huffman {
             root = new No(right, left);
             enqueue(root);
         }
+        this.buildEncodedBinaryChain(primeiro);
     }
 
     private String buildBinaryCode(char target, No root) {
