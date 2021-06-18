@@ -217,11 +217,15 @@ public class Huffman {
 
     public void compress(String fileInPath) throws IOException {
         fileIn = new BufferedReader(new FileReader(fileInPath));
-
+        int x = 0;
         StringBuilder lines = new StringBuilder();
         // lendo cada linha do arquvio e contando frequencia dos caracteres
         while (fileIn.ready()) {
-            line = fileIn.readLine();
+            line = "";
+            if (x > 0)
+                line = "\n";
+            x++;
+            line += fileIn.readLine();
             lines.append(line);
             char[] caracteres = line.toCharArray();
             this.countFrequency(caracteres);
