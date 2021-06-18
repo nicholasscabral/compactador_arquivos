@@ -21,9 +21,9 @@ public class Compactador {
                 break;
             }
             case 2: {
-                System.out.println("insira o caminho do arquivo a ser descompactado");
-                pathIn = input.next();
-                huffman.expand(pathIn);
+                //System.out.println("insira o caminho do arquivo a ser descompactado");
+                //pathIn = input.next();
+                huffman.expand("src/entrada.txt");
                 break;
             }
             case 3: break;

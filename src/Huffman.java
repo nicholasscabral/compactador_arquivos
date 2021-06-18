@@ -2,7 +2,7 @@ import java.io.*;
 
 public class Huffman {
     private No primeiro, ultimo, left, right, root;
-    private int contador;
+    private int contador, pos = 0;
     private int[] asciiTable;
     private String[] codeTable;
     private String code, line, fileOutPath = "src/saida.txt";
@@ -136,13 +136,14 @@ public class Huffman {
                     .append("1")
                     .append(String.format("%8s", Integer.toBinaryString(root.caracter)).replace(' ', '0'));
         }
+        else {
+            encodedBinaryChain.append("0");
+            if (root.esquerdo != null)
+                buildEncodedBinaryChain(root.esquerdo);
 
-        encodedBinaryChain.append("0");
-        if (root.esquerdo != null)
-            buildEncodedBinaryChain(root.esquerdo);
-
-        if (root.direito != null)
-            buildEncodedBinaryChain(root.direito);
+            if (root.direito != null)
+                buildEncodedBinaryChain(root.direito);
+        }
     }
 
     public void compress(String fileInPath) throws IOException {
@@ -175,9 +176,71 @@ public class Huffman {
         fileOut.close();
     }
 
-    public void expand(String fileInPath) throws FileNotFoundException {
+    public void expand(String fileInPath) throws IOException {
         fileIn = new BufferedReader(new FileReader(fileInPath));
+
+        String binaryTreeCode = fileIn.readLine();
+        No root = this.readEncodedBinaryChain(binaryTreeCode);
+        String message = fileIn.readLine();
+
+        String output = this.fullDecode(message, root);
+
+        fileOut.write(output);
+        fileOut.close();
     }
+
+    private No readEncodedBinaryChain(String code) {
+        if (code.charAt(pos) == '0') {
+            No node = new No();
+            node.isLeaf = false;
+            pos++;
+            node.esquerdo = readEncodedBinaryChain(code);
+            node.direito = readEncodedBinaryChain(code);
+            return node;
+        }
+        else {
+            pos++;
+            No node = new No();
+            node.isLeaf = true;
+
+            char c = 0;
+            for (int i = 0; i < 8; i++) {
+                c = (char) (2 * c + (code.charAt(i + pos) - '0'));
+            }
+            pos += 8;
+            node.caracter = c;
+
+            return node;
+        }
+    }
+
+    private char decode(String path, No node) {
+        if (node.isLeaf())
+            return node.caracter;
+        if (path.charAt(0) == '0')
+            return decode(path.substring(1), node.esquerdo);
+        else if (path.charAt(0) == '1')
+            return decode(path.substring(1), node.direito);
+        return 0;
+    }
+
+    private String fullDecode(String code, No root) {
+        No aux = root;
+        StringBuilder res = new StringBuilder();
+        for (int i = 0; i < code.length(); i++) {
+            if (code.charAt(i) == '0')
+                aux = aux.esquerdo;
+            else if (code.charAt(i) == '1')
+                aux = aux.direito;
+
+            if (aux.isLeaf()) {
+                res.append(aux.caracter);
+                aux = root;
+            }
+        }
+        return res.toString();
+    }
+
 
     private void buildTree() {
         while (primeiro != ultimo){

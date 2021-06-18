@@ -5,6 +5,7 @@ public class No {
     public No direito;
     public char caracter;
     public int frequencia;
+    public boolean isLeaf;
 
     public No(char dado, int frequencia) {
         this.anterior = null;
@@ -19,6 +20,13 @@ public class No {
         this.esquerdo = esquerdo;
         this.direito = direito;
         this.frequencia = esquerdo.frequencia + direito.frequencia;
+    }
+
+    public No() {
+        this.anterior = null;
+        this.proximo = null;
+        this.esquerdo = null;
+        this.direito = null;
     }
 
     public boolean isLeaf() {
