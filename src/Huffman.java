@@ -10,7 +10,6 @@ public class Huffman {
     private BufferedWriter fileOut = new BufferedWriter(new FileWriter(fileOutPath));
     private StringBuilder encodedBinaryChain = new StringBuilder();
 
-
     public Huffman() throws IOException {
         primeiro = null;
         ultimo = null;
@@ -112,6 +111,43 @@ public class Huffman {
         return false;
     }
 
+    private void countFrequency(char[] caracteres) {
+        for (char c : caracteres)
+            asciiTable[c]++;
+
+        for (char c : caracteres)
+            this.enqueue(c, asciiTable[c]);
+    }
+
+    private void buildTree() {
+        while (primeiro != ultimo){
+            left = dequeue();
+            right = dequeue();
+
+            root = new No(right, left);
+            enqueue(root);
+        }
+        this.buildEncodedBinaryChain(primeiro);
+    }
+
+    private String buildBinaryCode(char target, No root) {
+        if(root.isLeaf()) {
+            if(root.caracter == target)
+                return "";
+            else
+                return null;
+        }
+
+        String aux;
+        if((aux = buildBinaryCode(target, root.esquerdo)) != null)
+            return '0' + aux;
+
+        if((aux = buildBinaryCode(target, root.direito)) != null)
+            return '1' + aux;
+
+        return null;
+    }
+
     private String encode(String text) {
         StringBuilder out = new StringBuilder();
         for (char c : text.toCharArray()) {
@@ -121,13 +157,21 @@ public class Huffman {
         return out.toString();
     }
 
-    // preenche a tabela de frequencias
-    private void countFrequency(char[] caracteres) {
-        for (char c : caracteres)
-            asciiTable[c]++;
+    private String decode(String code, No root) {
+        No aux = root;
+        StringBuilder out = new StringBuilder();
+        for (int i = 0; i < code.length(); i++) {
+            if (code.charAt(i) == '0')
+                aux = aux.esquerdo;
+            else if (code.charAt(i) == '1')
+                aux = aux.direito;
 
-        for (char c : caracteres)
-            this.enqueue(c, asciiTable[c]);
+            if (aux.isLeaf()) {
+                out.append(aux.caracter);
+                aux = root;
+            }
+        }
+        return out.toString();
     }
 
     private void buildEncodedBinaryChain(No root) {
@@ -143,6 +187,31 @@ public class Huffman {
 
             if (root.direito != null)
                 buildEncodedBinaryChain(root.direito);
+        }
+    }
+
+    private No readEncodedBinaryChain(String code) {
+        if (code.charAt(pos) == '0') {
+            No node = new No();
+            node.isLeaf = false;
+            pos++;
+            node.esquerdo = readEncodedBinaryChain(code);
+            node.direito = readEncodedBinaryChain(code);
+            return node;
+        }
+        else {
+            pos++;
+            No node = new No();
+            node.isLeaf = true;
+
+            char c = 0;
+            for (int i = 0; i < 8; i++) {
+                c = (char) (2 * c + (code.charAt(i + pos) - '0'));
+            }
+            pos += 8;
+            node.caracter = c;
+
+            return node;
         }
     }
 
@@ -180,124 +249,12 @@ public class Huffman {
         fileIn = new BufferedReader(new FileReader(fileInPath));
 
         String binaryTreeCode = fileIn.readLine();
+
         No root = this.readEncodedBinaryChain(binaryTreeCode);
         String message = fileIn.readLine();
 
-        String output = this.fullDecode(message, root);
-
-        fileOut.write(output);
+        String out = this.decode(message, root);
+        fileOut.write(out);
         fileOut.close();
-    }
-
-    private No readEncodedBinaryChain(String code) {
-        if (code.charAt(pos) == '0') {
-            No node = new No();
-            node.isLeaf = false;
-            pos++;
-            node.esquerdo = readEncodedBinaryChain(code);
-            node.direito = readEncodedBinaryChain(code);
-            return node;
-        }
-        else {
-            pos++;
-            No node = new No();
-            node.isLeaf = true;
-
-            char c = 0;
-            for (int i = 0; i < 8; i++) {
-                c = (char) (2 * c + (code.charAt(i + pos) - '0'));
-            }
-            pos += 8;
-            node.caracter = c;
-
-            return node;
-        }
-    }
-
-    private char decode(String path, No node) {
-        if (node.isLeaf())
-            return node.caracter;
-        if (path.charAt(0) == '0')
-            return decode(path.substring(1), node.esquerdo);
-        else if (path.charAt(0) == '1')
-            return decode(path.substring(1), node.direito);
-        return 0;
-    }
-
-    private String fullDecode(String code, No root) {
-        No aux = root;
-        StringBuilder res = new StringBuilder();
-        for (int i = 0; i < code.length(); i++) {
-            if (code.charAt(i) == '0')
-                aux = aux.esquerdo;
-            else if (code.charAt(i) == '1')
-                aux = aux.direito;
-
-            if (aux.isLeaf()) {
-                res.append(aux.caracter);
-                aux = root;
-            }
-        }
-        return res.toString();
-    }
-
-
-    private void buildTree() {
-        while (primeiro != ultimo){
-            left = dequeue();
-            right = dequeue();
-
-            root = new No(right, left);
-            enqueue(root);
-        }
-        this.buildEncodedBinaryChain(primeiro);
-    }
-
-    private String buildBinaryCode(char target, No root) {
-        if(root.isLeaf()) {
-            if(root.caracter == target)
-                return "";
-            else
-                return null;
-        }
-
-        String aux;
-        if((aux = buildBinaryCode(target, root.esquerdo)) != null)
-            return '0' + aux;
-
-        if((aux = buildBinaryCode(target, root.direito)) != null)
-            return '1' + aux;
-
-        return null;
-    }
-
-    public int size() {
-        return contador;
-    }
-
-    private void listQueue() {
-        No aux = primeiro;
-
-        while (aux != null) {
-            System.out.print(aux.caracter + "(" + aux.frequencia + ") ");
-            aux = aux.proximo;
-        }
-        System.out.println();
-    }
-
-    public void listTree() {
-        this.listTree(primeiro);
-        System.out.println();
-    }
-
-    private void listTree(No root) {
-        if (root.esquerdo != null)
-            this.listTree(root.esquerdo);
-
-        System.out.print(root.caracter + "" + root.frequencia + " "); // ORDEM
-
-        if (root.direito != null) {
-            this.listTree(root.direito);
-        }
     }
 }
